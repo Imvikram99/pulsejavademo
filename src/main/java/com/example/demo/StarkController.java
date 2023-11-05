@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 
-//@RestController
+@RestController
 @RequestMapping("/stark")
 public class StarkController {
 

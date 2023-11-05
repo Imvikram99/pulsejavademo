@@ -9,7 +9,7 @@ import java.util.Random;
 
 import java.util.*;
 
-//@RestController
+@RestController
 @RequestMapping("/kingdom")
 public class KingdomController {
 
