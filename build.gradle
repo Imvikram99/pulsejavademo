@@ -1,0 +1,50 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '2.7.15'
+	id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+}
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+
+java {
+	sourceCompatibility = '17'
+}
+
+repositories {
+	mavenCentral()
+	mavenLocal()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'ai.apiverse:apipulse:1.0.18'
+	//implementation 'ai.apiverse:apipulse:1.0.21'
+	//implementation group: 'ai.apiverse', name: 'apipulse', version: '1.0.21', classifier: 'obfuscated'
+
+
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+
+//	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
+	//developmentOnly 'org.springframework.boot:spring-boot-devtools'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+//	implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+	implementation 'com.google.code.gson:gson:2.10.1'
+	implementation 'org.springframework.kafka:spring-kafka'
+	//implementation 'com.github.javafaker:javafaker:1.0.2'
+	implementation 'au.com.dius.pact.provider:gradle:4.5.5'
+	implementation 'org.flywaydb:flyway-core:9.16.3'
+	implementation 'org.modelmapper:modelmapper:3.1.1'
+	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.15.1'
+//	//feign client
+//	implementation 'org.springframework.cloud:spring-cloud-starter-openfeign:4.0.2'
+	implementation 'org.springframework.cloud:spring-cloud-dependencies:2022.0.1'
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
