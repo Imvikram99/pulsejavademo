@@ -4,6 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @RestController
 @RequestMapping("/naruto")
@@ -11,26 +12,82 @@ public class NarutoController {
 
     private static final List<String> NINJA_VILLAGES = Arrays.asList("Konoha", "Suna", "Kiri", "Iwa", "Kumo");
     private static final List<String> CHARACTERS = Arrays.asList("Naruto Uzumaki", "Sasuke Uchiha", "Sakura Haruno", "Kakashi Hatake", "Hinata Hyuga", "Shikamaru Nara");
+    private final AtomicInteger villageInfoCounter = new AtomicInteger(0);
+    private static final List<String> FIRST_VILLAGES_INFO = NINJA_VILLAGES.subList(0, 3); // First three for consistent response
+
+
+    private final AtomicInteger villageCounter = new AtomicInteger(0);
+    private final AtomicInteger characterCounter = new AtomicInteger(0);
+    private final AtomicInteger fightScenarioCounter = new AtomicInteger(0);
+    private final AtomicInteger registrationCounter = new AtomicInteger(0);
+
+    // Predefined responses for the first two hits
+    private static final String FIRST_VILLAGE = NINJA_VILLAGES.get(0);
+    private static final String FIRST_CHARACTER = CHARACTERS.get(0);
+    private static final String SECOND_CHARACTER = CHARACTERS.get(1);
+    private static final boolean FIRST_REGISTRATION_ACCEPTANCE = true;
 
     @GetMapping("/village/random")
     public ResponseEntity<Map<String, String>> getRandomVillage() {
-        Map<String, String> response = Collections.singletonMap("village", NINJA_VILLAGES.get(new Random().nextInt(NINJA_VILLAGES.size())));
-        return ResponseEntity.ok(response);
+        int count = villageCounter.incrementAndGet();
+        String village;
+        HttpStatus status;
+        if (count <= 2) {
+            village = FIRST_VILLAGE;
+            status = HttpStatus.OK;
+        } else {
+            village = NINJA_VILLAGES.get(new Random().nextInt(NINJA_VILLAGES.size()));
+            status = HttpStatus.INTERNAL_SERVER_ERROR;
+            if (count == 3) {
+                villageCounter.set(0);
+            }
+        }
+
+        Map<String, String> response = Collections.singletonMap("village", village);
+        return new ResponseEntity<>(response, status);
     }
 
     @GetMapping("/character/random")
     public ResponseEntity<Map<String, String>> getRandomCharacter() {
-        Map<String, String> response = Collections.singletonMap("character", CHARACTERS.get(new Random().nextInt(CHARACTERS.size())));
-        return ResponseEntity.ok(response);
+        int count = characterCounter.incrementAndGet();
+        String character;
+        HttpStatus status;
+        if (count <= 2) {
+            character = FIRST_CHARACTER;
+            status = HttpStatus.INTERNAL_SERVER_ERROR;
+        } else {
+            character = CHARACTERS.get(new Random().nextInt(CHARACTERS.size()));
+            status = HttpStatus.OK;
+            if (count == 3) {
+                characterCounter.set(0);
+            }
+        }
+
+        Map<String, String> response = Collections.singletonMap("character", character);
+        return new ResponseEntity<>(response, status);
     }
 
     @GetMapping("/fight/scenario/random")
     public ResponseEntity<Map<String, Object>> getRandomFightScenario() {
+        int count = fightScenarioCounter.incrementAndGet();
         Map<String, Object> response = new HashMap<>();
-        response.put("character1", CHARACTERS.get(new Random().nextInt(CHARACTERS.size())));
-        response.put("character2", CHARACTERS.get(new Random().nextInt(CHARACTERS.size())));
-        response.put("battleLocation", NINJA_VILLAGES.get(new Random().nextInt(NINJA_VILLAGES.size())));
-        response.put("outcome", Arrays.asList("Win", "Lose", "Draw").get(new Random().nextInt(3)));
+
+        if (count <= 2) {
+            response.put("character1", FIRST_CHARACTER);
+            response.put("character2", SECOND_CHARACTER);
+            response.put("battleLocation", FIRST_VILLAGE);
+            response.put("outcome", "Win"); // Assuming fixed outcome for the first two hits
+        } else {
+            response.put("character1", CHARACTERS.get(new Random().nextInt(CHARACTERS.size())));
+            response.put("character3", CHARACTERS.get(new Random().nextInt(CHARACTERS.size())));
+            response.put("character4", CHARACTERS.get(new Random().nextInt(CHARACTERS.size())));
+            response.put("battleLocation", NINJA_VILLAGES.get(new Random().nextInt(NINJA_VILLAGES.size())));
+            response.put("outcome", Arrays.asList("Win", "Lose", "Draw").get(new Random().nextInt(3)));
+            if (count == 3) {
+                fightScenarioCounter.set(0);
+            }
+        }
+
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -64,10 +121,22 @@ public class NarutoController {
 
     @PostMapping("/ninja/register/randomAccepted")
     public ResponseEntity<Map<String, Object>> registerNinja(@RequestBody Map<String, String> ninjaData) {
+        int count = registrationCounter.incrementAndGet();
         Map<String, Object> response = new HashMap<>(ninjaData);
-        response.put("registrationStatus", "Success");
-        response.put("timestamp", new Date());
-        response.put("isAccepted", new Random().nextBoolean());
+
+        if (count <= 2) {
+            response.put("registrationStatus", "Success");
+            response.put("timestamp", new Date());
+            response.put("isAccepted", FIRST_REGISTRATION_ACCEPTANCE);
+        } else {
+            response.put("registrationStatus", "Success");
+            response.put("timestamp", new Date());
+            response.put("isAccepted", new Random().nextBoolean());
+            if (count == 3) {
+                registrationCounter.set(0);
+            }
+        }
+
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
@@ -85,7 +154,21 @@ public class NarutoController {
 
     @GetMapping("/info/villages")
     public ResponseEntity<List<String>> getVillagesInfo() {
-        return ResponseEntity.ok(NINJA_VILLAGES);
+        int count = villageInfoCounter.incrementAndGet();
+        List<String> villages;
+        HttpStatus status;
+
+        if (count <= 2) {
+            villages = FIRST_VILLAGES_INFO;
+            status = HttpStatus.OK;
+        } else {
+            Collections.shuffle(NINJA_VILLAGES); // Shuffle the full list for randomization
+            villages = NINJA_VILLAGES.subList(0, new Random().nextInt(NINJA_VILLAGES.size()) + 1); // Randomize the number of villages to return
+            status = HttpStatus.INTERNAL_SERVER_ERROR; // On the third hit, we change the status
+            villageInfoCounter.set(0); // Reset the counter after the third hit for the next cycle
+        }
+
+        return new ResponseEntity<>(villages, status);
     }
 
     @GetMapping("/info/characters")
