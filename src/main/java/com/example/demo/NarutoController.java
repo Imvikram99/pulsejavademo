@@ -180,4 +180,34 @@ public class NarutoController {
     public ResponseEntity<Map<String, String>> alwaysError() {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Collections.singletonMap("error", "An unexpected error occurred"));
     }
+
+    @PostMapping("/api1")
+    public ResponseEntity<Map<String, Object>> api1(@RequestBody Map<String, Object> request) {
+        // Process the request and return a response
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "API 1 Response");
+        response.put("previousMessage", request.get("previousMessage")); // Add previous message
+        response.put("request", request);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/api2")
+    public ResponseEntity<Map<String, Object>> api2(@RequestBody Map<String, Object> request) {
+        // Process the request and return a response
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "API 2 Response");
+        response.put("previousMessage", request.get("previousMessage")); // Add previous message
+        response.put("request", request);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/api3")
+    public ResponseEntity<Map<String, Object>> api3(@RequestBody Map<String, Object> request) {
+        // Process the request and return a response
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "API 3 Response");
+        response.put("previousMessage", request.get("previousMessage")); // Add previous message
+        response.put("request", request);
+        return ResponseEntity.ok(response);
+    }
 }
