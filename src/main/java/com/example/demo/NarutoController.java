@@ -210,4 +210,16 @@ public class NarutoController {
         response.put("request", request);
         return ResponseEntity.ok(response);
     }
+
+    @PostMapping("/api4")
+    public ResponseEntity<Map<String, Object>> api4(@RequestBody Map<String, Object> request) {
+        // Process the request and return a response
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "API 4 Response");
+        response.put("previousMessage", request.get("previousMessage")); // Add previous message
+        response.put("request", request);
+        return ResponseEntity.ok(response);
+    }
+
+
 }
